@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Arboles;
-import java.util.ArrayList;
+import ListaEnlazada.ListaDoble;
 /**
  * Clase de arbol binario (estructuras no lineales)
  * @author ivancadena
@@ -11,11 +11,11 @@ import java.util.ArrayList;
 public class ArbolBinario <G extends Integer>{
     //******* Varibles de atributo *******//
     private NodoArbol raiz;
-    private ArrayList<NodoArbol> hojas;
+    private ListaDoble<NodoArbol> hojas;
     //******* Metodo Constructor *******//
     public ArbolBinario(){
         raiz = null;
-        hojas = new ArrayList();
+        hojas = new ListaDoble();
     }
     //******* Metodos de instancia *******//
     /**
@@ -118,10 +118,7 @@ public class ArbolBinario <G extends Integer>{
      * Metodo que muestra los nodos hoja
      */
     public void showLeafs(){
-        //ciclo de muestra de hojas
-        for(NodoArbol hoja : hojas){
-            System.out.print(hoja+" ");
-        }
+        System.out.print(hojas);
     }//fin showLeafs
     
     /**
@@ -263,7 +260,85 @@ public class ArbolBinario <G extends Integer>{
             }else
                 addSubArbol(raiz.izq,nodo);
         }//fin criterio
-    }//fin addRecursivo
+    }//fin addSubarbol
+    
+    /**
+     * Metodo que elimina un nodo especifico del arbol
+     * @param numero
+     * @return nodo del arbol eliminado, nulo si no se encontro nada
+     */
+    public NodoArbol remove(int numero){
+        //nodo temporal
+        NodoArbol eliminado = null;
+        //casos de eliminacion
+        if(numero!=raiz.getDato()){
+            //caso 1 (hoja)
+            eliminado = eliminarHoja(numero);
+        }else{
+            //caso 3 (raiz)
+            eliminado = eliminarRaiz();
+        }
+        return eliminado;
+    }//fin eliminar nodo
+    
+    //metodo para eliminar una hoja
+    private NodoArbol eliminarHoja(int numero){
+        NodoArbol temp = null;
+        //caso 1 (hoja)
+        int tamano = hojas.size();
+        for(int i = 1; i<=tamano; i++){
+            NodoArbol hoja = (NodoArbol) hojas.remove().getDato();
+            //buscamos entre las hojas
+            if(numero == hoja.getDato()){
+                temp = hoja.copia();
+                //validacion de rama ziquierda o derecha
+                if(hoja.padre.der == hoja){
+                    //desconexion
+                    hoja.padre = hoja.padre.der = null;
+                }else{
+                    //desconexion
+                    hoja.padre = hoja.padre.izq = null;
+                }//fin validacion de ramas
+            }else{
+                hojas.add(hoja);
+            }//fin busqueda de hojas
+        }//ciclo de barrido de hojas
+        return temp;
+    }//fin eliminar hojas
+    
+    //metodo para cambiar la raiz
+    private NodoArbol eliminarRaiz(){
+        //lista de hojas menores
+        ListaDoble menores = new ListaDoble();
+        //variable temporal
+        NodoArbol temp = null;
+        //tamaño de la lista de hojas
+        int tamano = hojas.size();
+        //ciclo de extraccion
+        for(int i = 1; i<=tamano; i++){
+            //extraccion de hoja
+            NodoArbol hoja = (NodoArbol) hojas.remove().getDato();
+            //validacion de hojas menores
+            if(hoja.getDato()<this.raiz.getDato()){
+                menores.add(hoja.copia());
+                hojas.add(hoja);
+            }else{
+                hojas.add(hoja);
+            }//fin validacion demhojas menores
+        }//fin ciclo de extraccion
+        //reemplazo de raiz
+        NodoArbol nuevaRaiz = (NodoArbol) menores.remove().getDato();
+        nuevaRaiz.der = this.raiz.der;
+        nuevaRaiz.izq = this.raiz.izq;
+        //desconexion
+        this.raiz.der.padre = this.raiz.izq.padre = nuevaRaiz;
+        this.raiz.der = this.raiz.izq = null;
+        temp = this.raiz;
+        this.raiz = nuevaRaiz;
+        //eliminacion de hoja
+        eliminarHoja(nuevaRaiz.getDato());
+        return temp;
+    }//fin de eliminar raiz
     //******* Metodo toString *******//
     @Override
     public String toString() {

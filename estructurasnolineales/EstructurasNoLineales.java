@@ -27,6 +27,10 @@ public class EstructurasNoLineales {
         arbol.showLeafs();
         System.out.println("");
         System.out.println("Raiz: "+arbol.root());
+        System.out.println("Se elimino: "+arbol.remove(4));
+        arbol.showLeafs();
+        System.out.println("");
+        System.out.println(arbol);
     }
     
 }
