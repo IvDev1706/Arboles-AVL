@@ -30,7 +30,7 @@ public class NodoArbol <G extends Integer> implements Cloneable{
         }
         return nuevo;
     }
-    public boolean isNode(){
+    public boolean isLeaf(){
         if(izq == null && der == null)
             return true;
         else

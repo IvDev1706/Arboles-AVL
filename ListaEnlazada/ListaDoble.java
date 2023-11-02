@@ -141,6 +141,34 @@ public class ListaDoble <G>{
         return temporal;
     }
     
+    /**
+     * Metodo que verifica que un elemento ya esta en la lista
+     * @param dato
+     * @return true si ya esta, false sino
+     */
+    public boolean isInList(G dato){
+        if(isInList(dato, inicio)){
+            return true;
+        }else{
+            return false;
+        }
+    }//fin isInList
+    
+    //metodo privado que verifica si el dato ya esta en la lista
+    private boolean isInList(G dato, NodoDoble cursor){
+        if(cursor!=null){
+            if(cursor.getDato() == dato){
+                return true;
+            }else if(cursor.der != null){
+                return isInList(dato, cursor.der);
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }//fin isInList
+    
     //metodo para retornar el tamaño
     public int size(){
         return tamaño;//retorno de tamaño

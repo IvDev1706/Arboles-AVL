@@ -109,7 +109,10 @@ public class ArbolBinario <G extends Integer>{
             return leafs(raiz.izq);
         //caso de hoja sin hijos
         }else{
-            hojas.add(raiz);
+            //validacion de datos repetidos
+            if(!hojas.isInList(raiz)){
+                hojas.add(raiz);
+            }//fin validacion de datos repetidos
             return 1;
         }//fin casos
     }//fin leafs
@@ -142,9 +145,11 @@ public class ArbolBinario <G extends Integer>{
         while(raiz != null){
             int factor = factorEquilibrio(raiz);
             if(factor==-2){
-               balanceoDD(raiz); 
+//                balanceoDD(raiz);
+                balanceoDI(raiz);
             }else if(factor==2){
-               balanceoII(raiz); 
+//                balanceoII(raiz);
+                balanceoID(raiz);
             }
             raiz = raiz.padre;
         }
@@ -175,7 +180,7 @@ public class ArbolBinario <G extends Integer>{
         //ciclo de extraccion de hijos (si existen)
         for(int i = 0; i<=2; i++){
             //incersion directa de nodos
-            if(raiz.izq != null && raiz.izq.isNode()){
+            if(raiz.izq != null && raiz.izq.isLeaf()){
                 addRecursivo(this.raiz,raiz.izq.copia());
             //incersion de subarbol
             }else if(raiz.izq!=null){
@@ -189,13 +194,13 @@ public class ArbolBinario <G extends Integer>{
         //validacion de hijo derecho en nodo C
         if(raiz != null){
             //incersion directa de nodo
-            if(raiz.isNode()){
+            if(raiz.isLeaf()){
                 addRecursivo(this.raiz,raiz.copia());
             }else{
                 addSubArbol(this.raiz,raiz);
             }
         }//fin validacion de derecha nodo C
-    }
+    }//fin DD
     
     //metodo para balancear por izquierda-izquierda
     private void balanceoII(NodoArbol raiz) {
@@ -223,7 +228,7 @@ public class ArbolBinario <G extends Integer>{
         //ciclo de extraccion de hijos (si existen)
          for(int i = 0; i<=2; i++){
             //incersion directa de nodos
-            if(raiz.der != null && raiz.der.isNode()){
+            if(raiz.der != null && raiz.der.isLeaf()){
                 addRecursivo(this.raiz,raiz.der.copia());
             }else if(raiz.der!=null){
                 NodoArbol subArbol = raiz.der;
@@ -236,13 +241,189 @@ public class ArbolBinario <G extends Integer>{
         //validacion de hijo derecho en nodo C
         if(raiz != null){
             //incersion directa de nodo
-            if(raiz.isNode()){
+            if(raiz.isLeaf()){
                 addRecursivo(this.raiz,raiz.copia());
             }else{
                 addSubArbol(this.raiz,raiz);
             }
         }//fin validacion de derecha nodo C
-    }
+    }//fin II
+    
+    //metodo para balancear por derecha-derecha
+    private void balanceoDI(NodoArbol raiz) {
+        NodoArbol padre = raiz.padre;//padre de la raiz temporal
+        //copias de nodos en derecha-derecha
+        NodoArbol nodoA = raiz.copia();
+        NodoArbol nodoB = raiz.der.copia();
+        NodoArbol nodoC = raiz.der.izq.copia();
+        //enlazar copias
+        nodoC.padre = padre;
+        nodoC.izq = nodoA;
+        nodoC.der = nodoB;
+        nodoA.padre = nodoB.padre = nodoC;
+        //validacion de padre
+        if(nodoC.padre == null){
+            this.raiz = nodoC;
+        }else{
+            raiz.padre = null;
+            if(padre.der == raiz)
+                padre.der = nodoC;
+            else
+                padre.izq = nodoC;
+        }//fin validacion
+        //validacion de hijos (si existen)
+        if(raiz.izq != null){
+            //validacion de hijo izquierdo
+            if(raiz.izq.isLeaf()){
+                //adicion de nodo
+                addRecursivo(this.raiz,raiz.izq.copia());
+            //caso de subarbol
+            }else{
+                NodoArbol subArbol = raiz.izq;
+                //desconexion de nodo
+                raiz.izq.padre = raiz.izq = null;
+                //adicion de subarbol
+                addSubArbol(this.raiz,subArbol);
+            }//fin validacion
+        }//validacion de nodo nulo
+        //validacion de hijo derecho nodo medio
+        if(raiz.der.der != null){
+            //validacion de hijo derecho
+            if(raiz.der.der.isLeaf()){
+                //adicion de nodo
+                addRecursivo(this.raiz,raiz.der.der.copia());
+            //caso de subarbol
+            }else{
+                NodoArbol subArbol = raiz.der.der;
+                //desconexion de nodo
+                raiz.der.der.padre = raiz.der.der = null;
+                //adicion de subarbol
+                addSubArbol(this.raiz,subArbol);
+            }//fin validacion
+        }//fin validacion denodo derecho de nodo medio
+        //validacion de hijos de nodo c
+        if(raiz.der.izq.der != null || raiz.der.izq.izq != null){
+            //validacion de hijo derecho
+            if(raiz.der.izq.der != null){
+                //validacion de hijo derecho
+                if(raiz.der.izq.der.isLeaf()){
+                    //adicion de nodo
+                    addRecursivo(this.raiz,raiz.der.izq.der.copia());
+                //caso de subarbol
+                }else{
+                    NodoArbol subArbol = raiz.der.izq.der;
+                    //desconexion de nodo
+                    raiz.der.izq.der.padre = raiz.der.izq.der = null;
+                    //adicion de subarbol
+                    addSubArbol(this.raiz,subArbol);
+                }//fin validacion
+            }//fin validacion dehijo derecho
+            
+            //validacion de hijo izquierdo
+            if(raiz.der.izq.izq != null){
+                //validacion de hijo derecho
+                if(raiz.der.izq.izq.isLeaf()){
+                    //adicion de nodo
+                    addRecursivo(this.raiz,raiz.der.izq.izq.copia());
+                //caso de subarbol
+                }else{
+                    NodoArbol subArbol = raiz.der.izq.izq;
+                    //desconexion de nodo
+                    raiz.der.izq.izq.padre = raiz.der.izq.izq = null;
+                    //adicion de subarbol
+                    addSubArbol(this.raiz,subArbol);
+                }//fin validacion
+            }//fin validacion de hijo izquierdo
+        }//fin validacion de hijos de nodo c
+    }//fin DI
+    
+        //metodo para balancear por derecha-derecha
+    private void balanceoID(NodoArbol raiz) {
+        NodoArbol padre = raiz.padre;//padre de la raiz temporal
+        //copias de nodos en derecha-derecha
+        NodoArbol nodoA = raiz.copia();
+        NodoArbol nodoB = raiz.izq.copia();
+        NodoArbol nodoC = raiz.izq.der.copia();
+        //enlazar copias
+        nodoC.padre = padre;
+        nodoC.der = nodoA;
+        nodoC.izq = nodoB;
+        nodoA.padre = nodoB.padre = nodoC;
+        //validacion de padre
+        if(nodoC.padre == null){
+            this.raiz = nodoC;
+        }else{
+            raiz.padre = null;
+            if(padre.der == raiz)
+                padre.der = nodoC;
+            else
+                padre.izq = nodoC;
+        }//fin validacion
+        //validacion de hijos (si existen)
+        if(raiz.der != null){
+            //validacion de hijo izquierdo
+            if(raiz.der.isLeaf()){
+                //adicion de nodo
+                addRecursivo(this.raiz,raiz.der.copia());
+            //caso de subarbol
+            }else{
+                NodoArbol subArbol = raiz.der;
+                //desconexion de nodo
+                raiz.der.padre = raiz.der = null;
+                //adicion de subarbol
+                addSubArbol(this.raiz,subArbol);
+            }//fin validacion
+        }//validacion de nodo nulo
+        //validacion de hijo derecho nodo medio
+        if(raiz.izq.izq != null){
+            //validacion de hijo derecho
+            if(raiz.izq.izq.isLeaf()){
+                //adicion de nodo
+                addRecursivo(this.raiz,raiz.izq.izq.copia());
+            //caso de subarbol
+            }else{
+                NodoArbol subArbol = raiz.izq.izq;
+                //desconexion de nodo
+                raiz.izq.izq.padre = raiz.izq.izq = null;
+                //adicion de subarbol
+                addSubArbol(this.raiz,subArbol);
+            }//fin validacion
+        }//fin validacion denodo derecho de nodo medio
+        //validacion de hijos de nodo c
+        if(raiz.izq.der.der != null || raiz.izq.der.izq != null){
+            //validacion de hijo derecho
+            if(raiz.izq.der.izq != null){
+                //validacion de hijo derecho
+                if(raiz.izq.der.izq.isLeaf()){
+                    //adicion de nodo
+                    addRecursivo(this.raiz,raiz.izq.der.izq.copia());
+                //caso de subarbol
+                }else{
+                    NodoArbol subArbol = raiz.izq.der.izq;
+                    //desconexion de nodo
+                    raiz.izq.der.izq.padre = raiz.izq.der.izq = null;
+                    //adicion de subarbol
+                    addSubArbol(this.raiz,subArbol);
+                }//fin validacion
+            }//fin validacion dehijo derecho
+            
+            //validacion de hijo izquierdo
+            if(raiz.izq.der.der != null){
+                //validacion de hijo derecho
+                if(raiz.izq.der.der.isLeaf()){
+                    //adicion de nodo
+                    addRecursivo(this.raiz,raiz.izq.der.der.copia());
+                //caso de subarbol
+                }else{
+                    NodoArbol subArbol = raiz.izq.der.der;
+                    //desconexion de nodo
+                    raiz.izq.der.der.padre = raiz.izq.der.der = null;
+                    //adicion de subarbol
+                    addSubArbol(this.raiz,subArbol);
+                }//fin validacion
+            }//fin validacion de hijo izquierdo
+        }//fin validacion de hijos de nodo c
+    }//fin ID
     
     //metodo recursivo de añadir un subarbol
     private void addSubArbol(NodoArbol raiz,NodoArbol nodo){
@@ -263,15 +444,53 @@ public class ArbolBinario <G extends Integer>{
     }//fin addSubarbol
     
     /**
+     * Metodo que busca y verifica la existencia de un valor
+     * @param numero
+     * @return true si encntro el valor, false si no existe
+     */
+    public boolean search(int numero){
+        //validacion de existencia de nodo
+        if(search(this.raiz, numero)!=null){
+            return true;
+        }else{
+            return false;
+        }//fin validacion de existencia
+    }//fin search
+    
+    //metodo privado para buscar un nodo
+    private NodoArbol search(NodoArbol raiz, int numero){
+        if(raiz != null){
+            //caso 1 (valor coincide)
+            if(numero == raiz.getDato()){
+                return raiz;
+            //caso 2 (valopr mayor)
+            }else if(numero > raiz.getDato()){
+                return search(raiz.der, numero);
+            //caso 3 (valor menor)
+            }else if(numero < raiz.getDato()){
+                return search(raiz.izq, numero);
+            }else{
+                return null;
+            }//fin casos
+        }else{
+            return null;
+        }
+    }//fin search
+    
+    /**
      * Metodo que elimina un nodo especifico del arbol
      * @param numero
      * @return nodo del arbol eliminado, nulo si no se encontro nada
      */
     public NodoArbol remove(int numero){
+        if(hojas.size()==0)
+            leafs();
         //nodo temporal
         NodoArbol eliminado = null;
         //casos de eliminacion
         if(numero!=raiz.getDato()){
+            NodoArbol temp = search(this.raiz,numero);
+            if(temp.isLeaf())
             //caso 1 (hoja)
             eliminado = eliminarHoja(numero);
         }else{
