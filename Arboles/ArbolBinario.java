@@ -93,25 +93,25 @@ public class ArbolBinario <G extends Integer>{
      * @return numero de hojas
      */
     public int leafs(){
-        return leafs(raiz);
+        return leafs(raiz,hojas);
     }//fin leafs
     
     //metodo recursivo de hojas
-    private int leafs(NodoArbol raiz){
+    private int leafs(NodoArbol raiz, ListaDoble lista){
         //caso dos hijos dirente de null
         if(raiz.der != null && raiz.izq != null){
-            return leafs(raiz.der)+leafs(raiz.izq);
+            return leafs(raiz.der,lista)+leafs(raiz.izq,lista);
         //caso de hijo derecho diferente de null e izquierdo null
         }else if(raiz.der != null && raiz.izq ==null){
-            return leafs(raiz.der);
+            return leafs(raiz.der,lista);
         //caso de hijo izquierdo diferente de null y derecho null
         }else if(raiz.izq != null && raiz.der == null){
-            return leafs(raiz.izq);
+            return leafs(raiz.izq,lista);
         //caso de hoja sin hijos
         }else{
             //validacion de datos repetidos
-            if(!hojas.isInList(raiz)){
-                hojas.add(raiz);
+            if(!lista.isInList(raiz)){
+                lista.add(raiz);
             }//fin validacion de datos repetidos
             return 1;
         }//fin casos
@@ -125,7 +125,7 @@ public class ArbolBinario <G extends Integer>{
     }//fin showLeafs
     
     /**
-     * Metod que retorna la raiz del arbol
+     * Metodo que retorna la raiz del arbol
      * @return raiz del arbol
      */
     public NodoArbol root(){
@@ -145,11 +145,11 @@ public class ArbolBinario <G extends Integer>{
         while(raiz != null){
             int factor = factorEquilibrio(raiz);
             if(factor==-2){
-//                balanceoDD(raiz);
-                balanceoDI(raiz);
+                balanceoDD(raiz);
+//                balanceoDI(raiz);
             }else if(factor==2){
-//                balanceoII(raiz);
-                balanceoID(raiz);
+                balanceoII(raiz);
+//                balanceoID(raiz);
             }
             raiz = raiz.padre;
         }
@@ -490,12 +490,16 @@ public class ArbolBinario <G extends Integer>{
         //casos de eliminacion
         if(numero!=raiz.getDato()){
             NodoArbol temp = search(this.raiz,numero);
-            if(temp.isLeaf())
-            //caso 1 (hoja)
-            eliminado = eliminarHoja(numero);
+            if(temp.isLeaf()){
+                //caso 1 (hoja)
+                eliminado = eliminarHoja(numero);
+             //caso 2 subarbol o nodo medio
+            }else{
+                eliminado = eliminarNodoMedio(temp);
+            }//fin validacion de nodos
         }else{
             //caso 3 (raiz)
-            eliminado = eliminarRaiz();
+            eliminado = eliminarRaiz(this.raiz,this.hojas);
         }
         return eliminado;
     }//fin eliminar nodo
@@ -525,8 +529,52 @@ public class ArbolBinario <G extends Integer>{
         return temp;
     }//fin eliminar hojas
     
+    //metodo que elimina un nodo medio
+    private NodoArbol eliminarNodoMedio(NodoArbol temp){
+        NodoArbol eliminado = null;
+        //lista de hojas desde el nodo temporal dado
+        ListaDoble hojasNodo = new ListaDoble();
+        leafs(temp,hojasNodo);
+        //validacion de casos
+        if(hojasNodo.size() == 1){
+            //extraccion de hoja
+            NodoArbol hoja = (NodoArbol) hojasNodo.remove().getDato();
+            //enlace padre-hoja y hoja-padre
+            hoja.padre = temp.padre;
+            if(hoja.padre.der==temp){
+                hoja.padre.der = hoja;
+            }else{
+                 hoja.padre.izq = hoja;
+            }
+            //desconectar temporal
+            temp.padre = temp.der = temp.izq = null;
+            eliminado = temp;
+        }else if(hojasNodo.size() == 2){
+            //extraccion de elementos
+            NodoArbol hoja1 = (NodoArbol) hojasNodo.remove().getDato();
+            NodoArbol hoja2 = (NodoArbol) hojasNodo.remove().getDato();
+            //identificacion del nodo menor
+            NodoArbol menor = new NodoArbol((Integer)Math.min(hoja1.getDato(), hoja2.getDato()));
+            NodoArbol mayor = new NodoArbol((Integer)Math.max(hoja1.getDato(), hoja2.getDato()));
+            //reconexiones
+            menor.padre = temp.padre;
+             if(menor.padre.der==temp){
+                menor.padre.der = menor;
+            }else{
+                 menor.padre.izq = menor;
+            }
+             menor.der = mayor;
+            //desconectar temporal
+            temp.padre = temp.der = temp.izq = null;
+            eliminado = temp;
+        }else if(hojasNodo.size()>2){
+            eliminarRaiz(temp, hojasNodo);
+        }
+        return eliminado;
+    }//fin eliminarNodoMedio
+    
     //metodo para cambiar la raiz
-    private NodoArbol eliminarRaiz(){
+    private NodoArbol eliminarRaiz(NodoArbol raiz, ListaDoble hojas){
         //lista de hojas menores
         ListaDoble menores = new ListaDoble();
         //variable temporal

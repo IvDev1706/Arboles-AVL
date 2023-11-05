@@ -19,9 +19,15 @@ public class EstructurasNoLineales {
 //        for (int i = 1; i <= 10; i++) {
 //            arbol.add(i);
 //        }
-        arbol.add(-1);
-        arbol.add(-3);
-        arbol.add(-2);
+//        arbol.add(-1);
+//        arbol.add(-3);
+//        arbol.add(-2);
+        arbol.add(3);
+        arbol.add(1);
+        arbol.add(5);
+        arbol.add(2);
+        arbol.add(4);
+        arbol.add(6);
         System.out.println(arbol);
         System.out.println("Numero de nodos del arbol: "+arbol.size());
         System.out.println("Altura del arbol: "+arbol.height());
@@ -30,11 +36,13 @@ public class EstructurasNoLineales {
         arbol.showLeafs();
         System.out.println("");
         System.out.println("Raiz: "+arbol.root());
-//        System.out.println("Se elimino: "+arbol.remove(4));
-//        arbol.showLeafs();
-//        System.out.println("");
-//        System.out.println(arbol);
+        NodoArbol eliminado = arbol.remove(5);
+        System.out.println("Se elimino: "+eliminado);
+        arbol.showLeafs();
+        System.out.println("");
+        System.out.println(arbol);
 //        System.out.println("Esta 4 en el arbol: "+arbol.search(4));
+        arbol.showLeafs();
     }
     
 }
