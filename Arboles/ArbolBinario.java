@@ -145,11 +145,15 @@ public class ArbolBinario <G extends Integer>{
         while(raiz != null){
             int factor = factorEquilibrio(raiz);
             if(factor==-2){
-                balanceoDD(raiz);
-//                balanceoDI(raiz);
+                if(factorEquilibrio(raiz)==-1)
+                    balanceoDD(raiz);
+                else
+                    balanceoDI(raiz);
             }else if(factor==2){
-                balanceoII(raiz);
-//                balanceoID(raiz);
+                if(factorEquilibrio(raiz)==1)
+                    balanceoII(raiz);
+                else
+                    balanceoID(raiz);
             }
             raiz = raiz.padre;
         }
@@ -551,11 +555,10 @@ public class ArbolBinario <G extends Integer>{
             eliminado = temp;
         }else if(hojasNodo.size() == 2){
             //extraccion de elementos
-            NodoArbol hoja1 = (NodoArbol) hojasNodo.remove().getDato();
-            NodoArbol hoja2 = (NodoArbol) hojasNodo.remove().getDato();
-            //identificacion del nodo menor
-            NodoArbol menor = new NodoArbol((Integer)Math.min(hoja1.getDato(), hoja2.getDato()));
-            NodoArbol mayor = new NodoArbol((Integer)Math.max(hoja1.getDato(), hoja2.getDato()));
+            NodoArbol mayor = (NodoArbol) hojasNodo.remove().getDato();
+            NodoArbol menor = (NodoArbol) hojasNodo.remove().getDato();
+            //eliminacion de hoja
+            eliminarHoja(menor.getDato());
             //reconexiones
             menor.padre = temp.padre;
              if(menor.padre.der==temp){
@@ -641,5 +644,4 @@ public class ArbolBinario <G extends Integer>{
             return "";
         }
     }//fin metodo posorden
-    
 }

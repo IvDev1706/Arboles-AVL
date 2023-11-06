@@ -16,18 +16,18 @@ public class EstructurasNoLineales {
     public static void main(String[] args) {
         // TODO code application logic here
         ArbolBinario arbol = new ArbolBinario();
-//        for (int i = 1; i <= 10; i++) {
-//            arbol.add(i);
-//        }
+        for (int i = 1; i <= 10; i++) {
+            arbol.add(i);
+        }
 //        arbol.add(-1);
 //        arbol.add(-3);
 //        arbol.add(-2);
-        arbol.add(3);
-        arbol.add(1);
-        arbol.add(5);
-        arbol.add(2);
-        arbol.add(4);
-        arbol.add(6);
+//        arbol.add(3);
+//        arbol.add(1);
+//        arbol.add(5);
+//        arbol.add(2);
+//        arbol.add(4);
+//        arbol.add(6);
         System.out.println(arbol);
         System.out.println("Numero de nodos del arbol: "+arbol.size());
         System.out.println("Altura del arbol: "+arbol.height());
@@ -43,6 +43,7 @@ public class EstructurasNoLineales {
         System.out.println(arbol);
 //        System.out.println("Esta 4 en el arbol: "+arbol.search(4));
         arbol.showLeafs();
+        System.out.println("Raiz: "+arbol.root());
     }
     
 }
