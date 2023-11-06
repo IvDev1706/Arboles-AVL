@@ -145,12 +145,12 @@ public class ArbolBinario <G extends Integer>{
         while(raiz != null){
             int factor = factorEquilibrio(raiz);
             if(factor==-2){
-                if(factorEquilibrio(raiz)==-1)
+                if(factorEquilibrio(raiz.der)==-1)
                     balanceoDD(raiz);
                 else
                     balanceoDI(raiz);
             }else if(factor==2){
-                if(factorEquilibrio(raiz)==1)
+                if(factorEquilibrio(raiz.izq)==1)
                     balanceoII(raiz);
                 else
                     balanceoID(raiz);
