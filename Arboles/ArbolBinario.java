@@ -147,13 +147,17 @@ public class ArbolBinario <G extends Integer>{
             if(factor==-2){
                 if(factorEquilibrio(raiz.der)==-1)
                     balanceoDD(raiz);
-                else
+                else if(factorEquilibrio(raiz.der)==1)
                     balanceoDI(raiz);
+                else
+                    balanceoDD(raiz);
             }else if(factor==2){
                 if(factorEquilibrio(raiz.izq)==1)
                     balanceoII(raiz);
-                else
+                else if(factorEquilibrio(raiz.izq)==-1)
                     balanceoID(raiz);
+                else
+                    balanceoII(raiz);
             }
             raiz = raiz.padre;
         }
@@ -503,7 +507,7 @@ public class ArbolBinario <G extends Integer>{
             }//fin validacion de nodos
         }else{
             //caso 3 (raiz)
-            eliminado = eliminarRaiz(this.raiz,this.hojas);
+            eliminado = eliminarRaiz(this.raiz);
         }
         return eliminado;
     }//fin eliminar nodo
@@ -518,13 +522,16 @@ public class ArbolBinario <G extends Integer>{
             //buscamos entre las hojas
             if(numero == hoja.getDato()){
                 temp = hoja.copia();
+                NodoArbol padre = hoja.padre;
                 //validacion de rama ziquierda o derecha
                 if(hoja.padre.der == hoja){
                     //desconexion
                     hoja.padre = hoja.padre.der = null;
+                    balancear(padre);
                 }else{
                     //desconexion
                     hoja.padre = hoja.padre.izq = null;
+                    balancear(padre);
                 }//fin validacion de ramas
             }else{
                 hojas.add(hoja);
@@ -571,42 +578,42 @@ public class ArbolBinario <G extends Integer>{
             temp.padre = temp.der = temp.izq = null;
             eliminado = temp;
         }else if(hojasNodo.size()>2){
-            eliminarRaiz(temp, hojasNodo);
+            eliminarRaiz(temp);
         }
         return eliminado;
     }//fin eliminarNodoMedio
     
     //metodo para cambiar la raiz
-    private NodoArbol eliminarRaiz(NodoArbol raiz, ListaDoble hojas){
-        //lista de hojas menores
-        ListaDoble menores = new ListaDoble();
-        //variable temporal
-        NodoArbol temp = null;
-        //tamaño de la lista de hojas
-        int tamano = hojas.size();
-        //ciclo de extraccion
-        for(int i = 1; i<=tamano; i++){
-            //extraccion de hoja
-            NodoArbol hoja = (NodoArbol) hojas.remove().getDato();
-            //validacion de hojas menores
-            if(hoja.getDato()<this.raiz.getDato()){
-                menores.add(hoja.copia());
-                hojas.add(hoja);
-            }else{
-                hojas.add(hoja);
-            }//fin validacion demhojas menores
-        }//fin ciclo de extraccion
+    private NodoArbol eliminarRaiz(NodoArbol raiz){
+        //variables temporales
+        NodoArbol temp, cursor;
+        //puntero a la primera izquierda
+        cursor = raiz.izq;
+        //respaldo de raiz original
+        temp = raiz;
+        //ciclo para encontrar el elemento mas a la derecha
+        while(cursor.der!=null){
+            cursor = cursor.der;
+        }//fin ciclo de busqueda
         //reemplazo de raiz
-        NodoArbol nuevaRaiz = (NodoArbol) menores.remove().getDato();
-        nuevaRaiz.der = this.raiz.der;
-        nuevaRaiz.izq = this.raiz.izq;
-        //desconexion
-        this.raiz.der.padre = this.raiz.izq.padre = nuevaRaiz;
-        this.raiz.der = this.raiz.izq = null;
-        temp = this.raiz;
-        this.raiz = nuevaRaiz;
-        //eliminacion de hoja
-        eliminarHoja(nuevaRaiz.getDato());
+        if(raiz.padre == null){
+            this.raiz = cursor;
+        }else{
+            cursor.padre = raiz.padre;
+        }//fin reemplazo de raiz
+        //validacion de hoja
+        if(cursor.isLeaf()){
+          cursor.der = raiz.der;
+          cursor.izq = raiz.izq;
+        //caso de subarbol    
+        }else{
+            //validacionde hijo izquierdo
+            if(cursor.izq.isLeaf()){
+                addRecursivo(this.raiz,cursor.izq);
+            }else{
+                addSubArbol(this.raiz,cursor.izq);
+            }
+        }
         return temp;
     }//fin de eliminar raiz
     //******* Metodo toString *******//
